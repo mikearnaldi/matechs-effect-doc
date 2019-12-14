@@ -24,9 +24,9 @@ Multiple implementations are available with different tradeoffs:
       <td style="text-align:left">
         <p>Content: <code>JSON</code>, <code>URLEncoded</code>, <code>Multipart</code>
           <br
-          />Protocols: <code>HTTP 1 &amp; 2</code>  <code>(not in node js)</code>
+          />Protocols: <code>HTTP 1 &amp; 2</code>  <code>(not in Node.js)</code>
         </p>
-        <p>Target: <code>Browser &amp; Node (with any fetch polyfill)</code>
+        <p>Target: <code>Browser &amp; Node.js (with any fetch polyfill)</code>
         </p>
         <p>Cancellable:<code> yes (but socket will complete due to fetch)</code>
         </p>
@@ -40,7 +40,7 @@ Multiple implementations are available with different tradeoffs:
           <br
           />Protocols: <code>HTTP 1 &amp; 2</code>
         </p>
-        <p>Target: <code>Node</code>
+        <p>Target: <code>Node.js</code>
         </p>
         <p>Cancellable: <code>yes</code>
         </p>
@@ -285,13 +285,13 @@ export function getMethodAsString(method: Method): string
 
 ## Usage
 
-Let's add an implementation, we are gonna use libcurl for this purpose
+Let's add an implementation, we are gonna use libcurl for this purpose:
 
 ```typescript
 yarn add @matechs/http-client-libcurl
 ```
 
-We are going to start with a simple get request
+We are going to start with a simple get request:
 
 ```typescript
 import { effect as T, exit as E } from "@matechs/effect";
@@ -469,7 +469,7 @@ This will print:
 ]
 ```
 
-Let's suppose [https://jsonplaceholder.typicode.com](https://jsonplaceholder.typicode.com) is a domain where we want to send specific headers, for example an auth token we can easily wire in the middleware enviromnet with only a small addition:
+Let's suppose [https://jsonplaceholder.typicode.com](https://jsonplaceholder.typicode.com) is a domain where we want to send specific headers, for example an auth token. We can easily wire it in the middleware environment with only a small addition:
 
 ```typescript
 // live environment with libcurl and json deserializer and header middleware

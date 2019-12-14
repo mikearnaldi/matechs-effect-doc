@@ -1,5 +1,5 @@
 ---
-description: 'Exit represents the resul of an effect execution,'
+description: 'Exit represents the result of an effect execution'
 ---
 
 # Play with Exit
@@ -24,7 +24,7 @@ export function fold<E, A, R>(
 ): (e: Exit<E, A>) => R
 ```
 
-The Exit ADT located at `@matechs/effect/lib/original/exit`:
+The `Exit` ADT located at `@matechs/effect/lib/original/exit`:
 
 ```typescript
 export type Exit<E, A> = Done<A> | Cause<E>;

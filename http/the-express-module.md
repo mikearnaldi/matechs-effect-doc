@@ -1,5 +1,5 @@
 ---
-description: Provides an environmental effect that wraps and express app
+description: Provides an environmental effect that wraps and Express application
 ---
 
 # The Express Module
@@ -144,5 +144,5 @@ $ curl http://127.0.0.1:8081/
 
 ## Notes
 
-The module is a work in progress and api is expected to be changed \(not significantly\)
+The module is a work in progress and API is expected to be changed \(not significantly\).
 
