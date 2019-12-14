@@ -27,3 +27,4 @@ $ yarn install -D typescript
 
 You will need to scaffold a classic npm package with typescript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both tsconfig & jest configs.
 
+## update
