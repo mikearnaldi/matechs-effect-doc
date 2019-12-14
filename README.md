@@ -1,0 +1,29 @@
+---
+description: 'And write better end to end software, so you can sleep at night!'
+---
+
+# How to use Effect!
+
+## Getting Super Powers
+
+You will aquire knowledge on how to build software in a purely functional manner, you will leverage a particular kind of algebraic effects called environmental effects in order to structure your code in a better way enabling you to test each individual component in an isolated way and making your modules reusable and composable.
+
+We are not cheating, neither using magic tricks! By leveraging functional programming principles we have developed a set of libraries that enrich the fp-ts ecosystem with the functionalities that you may find in a library like ZIO in the Scala ecosystem.
+
+The latest development in the core typescript language allow us to take environment usage even further compared to what ZIO can achieve, namely typescript has a very good support for intersection types and this makes environment usage wanderful.
+
+## Installation
+
+So let's get the superpowers, bootstrap a new npm project and install basic dependencies
+
+```
+$ mkdir my-project
+$ yarn init -y
+$ yarn install fp-ts fp-ts-contrib @matechs/effect
+$ yarn install -D typescript
+```
+
+## Project Config
+
+You will need to scaffold a classic npm package with typescript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both tsconfig & jest configs.
+
