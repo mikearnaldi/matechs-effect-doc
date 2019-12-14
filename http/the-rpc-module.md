@@ -33,7 +33,7 @@ import { isSome } from "fp-ts/lib/Option";
 const clientConfigEnv: unique symbol = Symbol();
 const serverConfigEnv: unique symbol = Symbol();
 
-// describean environment that support RPC
+// describe an environment that supports RPC
 export type Remote<T> = Record<
   keyof T,
   Record<string, FunctionN<any, T.Effect<any, any, any>>>
@@ -360,9 +360,9 @@ $ yarn ts-node src/client.ts
 ]
 ```
 
-## Note
+## Notes
 
 You can wire as many modules as you need! Keep in mind both arguments and return types \(error/success\) must be serializable in order for RPC to do its magic.
 
-Full example with complete separation of server/client available at [https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo](https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo) 
+Full example with complete separation of server/client available at [https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo](https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo).
 

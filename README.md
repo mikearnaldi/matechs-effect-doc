@@ -8,13 +8,13 @@ description: 'And write better end to end software, so you can sleep at night!'
 
 You will aquire knowledge on how to build software in a purely functional manner, you will leverage a particular kind of algebraic effects called environmental effects in order to structure your code in a better way enabling you to test each individual component in an isolated way and making your modules reusable and composable.
 
-We are not cheating, neither using magic tricks! By leveraging functional programming principles we have developed a set of libraries that enrich the fp-ts ecosystem with the functionalities that you may find in a library like ZIO in the Scala ecosystem.
+We are not cheating, neither using magic tricks! By leveraging functional programming principles we have developed a set of libraries that enrich the [fp-ts](https://github.com/gcanti/fp-ts) ecosystem with the functionalities that you may find in a library like [ZIO](https://github.com/zio/zio) in the Scala ecosystem.
 
-The latest development in the core typescript language allow us to take environment usage even further compared to what ZIO can achieve, namely typescript has a very good support for intersection types and this makes environment usage wanderful.
+The latest development in the core TypeScript language allow us to take environment usage even further compared to what ZIO can achieve, namely TypeScript has a very good support for intersection types and this makes environment usage wonderful.
 
 ## Installation
 
-So let's get the superpowers, bootstrap a new npm project and install basic dependencies
+So let's get the superpowers, bootstrap a new `npm` project and install basic dependencies:
 
 ```
 $ mkdir my-project
@@ -25,4 +25,4 @@ $ yarn install -D typescript
 
 ## Project Config
 
-You will need to scaffold a classic npm package with typescript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both tsconfig & jest configs.
+You will need to scaffold a classic `npm` package with TypeScript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both `tsconfig` & `jest` configs.

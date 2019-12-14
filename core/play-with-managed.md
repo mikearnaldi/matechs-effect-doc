@@ -1,5 +1,5 @@
 ---
-description: Managed represent safe acquisition / usage and release of resources
+description: Managed represents safe acquisition / usage and release of resources
 ---
 
 # Play with Managed
@@ -263,5 +263,5 @@ T.run(program, () => {
 });
 ```
 
-Note that `Managed` can represent any resource for example `database connections` and anything that need safe cleanup, additionally finalizers \(like release in this case\) are guaranteed to run even if effect is interrupted while the resource is in usage.
+Note that `Managed` can represent any resource, for example `database connections` and anything that need safe cleanup. Additionally, finalizers \(like release in this case\) are guaranteed to run even if `effect` is interrupted while the resource is in usage.
 

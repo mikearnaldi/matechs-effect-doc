@@ -1,5 +1,5 @@
 ---
-description: Core functions available to create and trasnform effects
+description: Core functions available to create and transform effects
 ---
 
 # Play with Effect

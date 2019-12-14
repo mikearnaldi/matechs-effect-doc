@@ -16,7 +16,7 @@ Mentally you can think of this in simplified terms as:
 type Effect<R, E, A> = (environment: R) => Async<E, A>
 ```
 
-Where R represent an environment needed for the computation `Async<E, A>` to run and when started the computation may succeed with a result `A` or fail with an error `E`
+Where `R` represents an environment needed for the computation `Async<E, A>` to run and when started the computation may succeed with a result `A` or fail with an error `E`.
 
 ### Simple Effect
 
@@ -30,7 +30,7 @@ const helloWorld = T.sync(() => {
 })
 ```
 
-We can already highlight the type of helloWorld and discover that:
+We can already highlight the type of `helloWorld` and discover that:
 
 ```typescript
 import { effect as T } from "@matechs/effect"
@@ -40,7 +40,7 @@ const helloWorld: T.Effect<unknown, never, void> = T.sync(() => {
 })
 ```
 
-So we can say that `helloWorld` is an effect that requires no environment, can never fail and upon completion retruns `void`
+So we can say that `helloWorld` is an effect that requires no environment, can never fail and upon completion returns `void`.
 
 ### Running
 
@@ -65,7 +65,7 @@ const cancelFunction: Lazy<void> = T.run(helloWorld, (ex: Exit<never, void>) => 
 cancelFunction();
 ```
 
-What's wrong with this? nothing in principle but from `helloWorld` we are directly calling `console.log` what if we want to test this?
+What's wrong with this? Nothing in principle, but from `helloWorld` we are directly calling `console.log`. What if we want to test this?
 
 ### Environmental Effect 
 
@@ -92,7 +92,7 @@ function log(s: string) {
 }
 ```
 
-let's use our newly created log function:
+Let's use our newly created `log` function:
 
 ```typescript
 // as you can see we are now requiring a ConsoleEnv to run our effect
@@ -113,13 +113,13 @@ const consoleLive: ConsoleEnv = {
 
 ### Running Live
 
-In order to run the program you will need to provide the module before passing it into the run/runToPromise/runToPromiseExit
+In order to run the program you will need to provide the module before passing it into the `run`/`runToPromise`/`runToPromiseExit`:
 
 ```typescript
 T.run(T.provideAll(consoleLive)(helloWorld))
 ```
 
-The provideAll function takes a complete environment and provides it to the program, when called this will print:
+The `provideAll` function takes a complete environment and provides it to the program, when called this will print:
 
 ```typescript
 $ yarn ts-node src/hello.ts
