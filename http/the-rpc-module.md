@@ -41,7 +41,6 @@ export type Remote<T> = Record<
 
 // describe a client configuration
 interface ClientConfig<M, K extends keyof M> {
-  [clientConfigEnv]: {
     [k in K]: {
       baseUrl: string;
     };
@@ -56,7 +55,6 @@ export function clientConfig<M, K extends keyof M>(
 
 // describe a server configuration
 interface ServerConfig<M, K extends keyof M> {
-  [serverConfigEnv]: {
     [k in K]: {
       scope: string;
     };
@@ -123,7 +121,6 @@ export interface Todo {
 
 // describe the service we want to expose
 export interface PlaceholderJson extends RPC.Remote<PlaceholderJson> {
-  [placeholderJsonEnv]: {
     getTodo: (n: number) => T.Effect<H.RequestEnv, string, Option<Todo>>;
   };
 }
@@ -139,7 +136,6 @@ export interface PlaceholderJson extends RPC.Remote<PlaceholderJson> {
 
 // implement the service
 export const placeholderJsonLive: PlaceholderJson = {
-  [placeholderJsonEnv]: {
     getTodo: n =>
       pipe(
         H.get<unknown, Todo>(`https://jsonplaceholder.typicode.com/todos/${n}`),
@@ -152,7 +148,6 @@ export const placeholderJsonLive: PlaceholderJson = {
 // spec for client generation
 // used if placeholderJsonLive -> server.ts
 export const placeholderJsonSpec: PlaceholderJson = {
-  [placeholderJsonEnv]: {
     getTodo: {} as any
   }
 };

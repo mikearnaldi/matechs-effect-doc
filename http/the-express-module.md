@@ -26,7 +26,6 @@ export const expressEnv: unique symbol = Symbol();
 
 // environment to hold the app instance
 export interface HasExpress {
-  [expressAppEnv]: {
     app: EX.Express;
   };
 }
@@ -36,7 +35,6 @@ export type Method = "post" | "get" | "put" | "patch" | "delete";
 
 // effect
 export interface Express {
-  [expressEnv]: {
     withApp<R, E, A>(op: T.Effect<R & HasExpress, E, A>): T.Effect<R, E, A>;
     route<R, E, RES>(
       method: Method,
@@ -122,7 +120,7 @@ T.run(
           process.exit(err ? 2 : 0);
         });
       });
-      
+
       // listen for SIGTERM
       process.on("SIGTERM", () => {
         server.close(err => {

@@ -16,7 +16,7 @@ The latest development in the core TypeScript language allow us to take environm
 
 So let's get the superpowers, bootstrap a new `npm` project and install basic dependencies:
 
-```
+```text
 $ mkdir my-project
 $ yarn init -y
 $ yarn install fp-ts fp-ts-contrib @matechs/effect
@@ -26,3 +26,4 @@ $ yarn install -D typescript
 ## Project Config
 
 You will need to scaffold a classic `npm` package with TypeScript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both `tsconfig` & `jest` configs.
+

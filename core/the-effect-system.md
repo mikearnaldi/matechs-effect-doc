@@ -18,7 +18,7 @@ type Effect<R, E, A> = (environment: R) => Async<E, A>
 
 Where `R` represents an environment needed for the computation `Async<E, A>` to run and when started the computation may succeed with a result `A` or fail with an error `E`.
 
-### Simple Effect
+## Simple Effect
 
 Let's start with a simple hello world:
 
@@ -42,7 +42,7 @@ const helloWorld: T.Effect<unknown, never, void> = T.sync(() => {
 
 So we can say that `helloWorld` is an effect that requires no environment, can never fail and upon completion returns `void`.
 
-### Running
+## Running
 
 We can run the effect in multiple ways:
 
@@ -67,7 +67,7 @@ cancelFunction();
 
 What's wrong with this? Nothing in principle, but from `helloWorld` we are directly calling `console.log`. What if we want to test this?
 
-### Environmental Effect 
+## Environmental Effect
 
 We can create a module that wraps the console interaction and use the module from environment like:
 
@@ -79,7 +79,6 @@ const consoleUri: unique symbol = Symbol();
 // create an interface that describe the module
 // you want to put only core implementation functions here
 interface ConsoleEnv {
-  [consoleUri]: {
     log: (s: string) => T.Effect<unknown, never, void>;
   };
 }
@@ -105,13 +104,12 @@ Let's write an implementation:
 
 ```typescript
 const consoleLive: ConsoleEnv = {
-  [consoleUri]: {
     log: (s: string) => T.sync(() => console.log(s))
   }
 };
 ```
 
-### Running Live
+## Running Live
 
 In order to run the program you will need to provide the module before passing it into the `run`/`runToPromise`/`runToPromiseExit`:
 
@@ -126,7 +124,7 @@ $ yarn ts-node src/hello.ts
 hello world!
 ```
 
-### Running Test
+## Running Test
 
 What if we want to test now?
 

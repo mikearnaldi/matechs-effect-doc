@@ -10,32 +10,34 @@ description: >-
 
 Multiple implementations are available with different tradeoffs:
 
+| Package | Features |
+| :--- | :--- |
+
+
 <table>
   <thead>
     <tr>
-      <th style="text-align:left">Package</th>
-      <th style="text-align:left">Features</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align:left"><code>@matechs/http-client-fetch</code>
-      </td>
-      <td style="text-align:left">
+      <th style="text-align:left"><code>@matechs/http-client-fetch</code>
+      </th>
+      <th style="text-align:left">
         <p>Content: <code>JSON</code>, <code>URLEncoded</code>, <code>Multipart</code>
           <br
           />Protocols: <code>HTTP 1 &amp; 2</code>  <code>(not in Node.js)</code>
         </p>
         <p>Target: <code>Browser &amp; Node.js (with any fetch polyfill)</code>
         </p>
-        <p>Cancellable:<code> yes (but socket will complete due to fetch)</code>
+        <p>Cancellable: <code>yes (but socket will complete due to fetch)</code>
         </p>
-      </td>
+      </th>
     </tr>
+  </thead>
+  <tbody></tbody>
+</table><table>
+  <thead>
     <tr>
-      <td style="text-align:left"><code>@matechs/http-client-libcurl</code>
-      </td>
-      <td style="text-align:left">
+      <th style="text-align:left"><code>@matechs/http-client-libcurl</code>
+      </th>
+      <th style="text-align:left">
         <p>Content: <code>JSON, URLEncoded (no support for multipart yet)</code>
           <br
           />Protocols: <code>HTTP 1 &amp; 2</code>
@@ -44,12 +46,11 @@ Multiple implementations are available with different tradeoffs:
         </p>
         <p>Cancellable: <code>yes</code>
         </p>
-      </td>
+      </th>
     </tr>
-  </tbody>
-</table>## Install
-
-```text
+  </thead>
+  <tbody></tbody>
+</table>```text
 yarn add @matechs/http-client
 ```
 
@@ -80,7 +81,6 @@ export type RequestType = "JSON" | "DATA" | "FORM";
 
 // represents an input compatible with type DATA
 export interface DataInput {
-  [k: string]: unknown;
 }
 
 // represents headers
@@ -119,7 +119,6 @@ export type HttpError<ErrorBody> =
 
 // describe an effect used to deserialize http responses
 export interface HttpDeserializer {
-  [httpDeserializerEnv]: {
     response: <A>(a: string) => A | undefined;
     errorResponse: <E>(error: string) => E | undefined;
   };
@@ -138,7 +137,6 @@ export interface HttpHeaders {
 
 // main http effect
 export interface Http {
-  [httpEnv]: {
     request: <E, O>(
       method: Method,
       url: string,
@@ -244,7 +242,7 @@ export function delData<I extends DataInput, E, O>(
   url: string,
   body?: I
 ): T.Effect<RequestEnv, HttpError<E>, Response<O>>
- 
+
 // FORM DELETE
 export function delForm<E, O>(
   url: string,
@@ -478,12 +476,13 @@ const envLive = pipe(
   T.mergeEnv(L.libcurl()),
   T.mergeEnv(HTTP.jsonDeserializer),
   T.mergeEnv(
-    HTTP.withPathHeaders({ token: "demo" }, path =>
-      path.startsWith("https://jsonplaceholder.typicode.com")
-    )
+    HTTP.middlewareStack([
+      HTTP.withPathHeaders({ token: "demo" }, path =>
+        path.startsWith("https://jsonplaceholder.typicode.com")
+      )
+    ])
   )
 );
-
 ```
 
 The rest of the code doesn't change and you are not sending the header!

@@ -1,5 +1,5 @@
 ---
-description: 'Exit represents the result of an effect execution'
+description: Exit represents the result of an effect execution
 ---
 
 # Play with Exit
