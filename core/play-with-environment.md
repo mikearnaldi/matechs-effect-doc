@@ -62,7 +62,7 @@ const foldExit = <A>(onDone: (a: A) => void) =>
   E.fold(
     onDone,
     e => console.error("error:", e),
-    e => console.error("abort", e),
+    e => console.error("abort:", e),
     () => console.error("interrupt")
   );
 
