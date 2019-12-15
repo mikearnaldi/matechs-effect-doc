@@ -54,71 +54,93 @@ export const provideSomeM = <R2, R, E2>(
 ## Usage
 
 ```typescript
-import { effect as T, exit as ex } from "@matechs/effect"
+import { effect as T, exit as E } from "@matechs/effect";
+import { pipe } from "fp-ts/lib/pipeable";
 
-it("provideR", async () => {
-  const http_symbol: unique symbol = Symbol();
-
-  interface HttpEnv {
-    [http_symbol]: number;
-  }
-
-  assert.deepEqual(
-    await T.runToPromiseExit(
-      T.provideR(() => ({ [http_symbol]: 10 }))(
-        T.access(({ [http_symbol]: n }: HttpEnv) => n)
-      )
-    ),
-    ex.done(10)
+// utility to handle exit
+const foldExit = <A>(onDone: (a: A) => void) =>
+  E.fold(
+    onDone,
+    e => console.error("error:", e),
+    e => console.error("abort", e),
+    () => console.error("interrupt")
   );
-});
 
-it("provide", async () => {
-  const http_symbol: unique symbol = Symbol();
+// unique symbol to hold an environment for app configuration
+const appConfigEnv: unique symbol = Symbol();
 
-  interface HttpEnv {
-    [http_symbol]: number;
+// describe the AppConfig environment entry
+interface AppConfig {
+  [appConfigEnv]: {
+    appName: string;
+  };
+}
+
+// implement the live version of the config
+const appConfigLive: AppConfig = {
+  [appConfigEnv]: {
+    appName: "My First App"
   }
+};
 
-  assert.deepEqual(
-    await T.runToPromiseExit(
-      pipe(
-        T.access(({ [http_symbol]: n }: HttpEnv) => n),
-        T.provide({ [http_symbol]: 10 }),
-        T.provide(env2),
-        T.provide(env3)
-      )
-    ),
-    ex.done(10)
-  );
-});
+// utility to access the config
+function appName(): T.Effect<AppConfig, never, string> {
+  return T.access(({ [appConfigEnv]: { appName } }: AppConfig) => appName);
+}
 
-it("mergeEnv", async () => {
-  const http_symbol: unique symbol = Symbol();
+// unique symbol to hold an environment for console effect
+const consoleEnv: unique symbol = Symbol();
 
-  interface HttpEnv {
-    [http_symbol]: number;
+// describe the console environmental effect
+interface Console {
+  [consoleEnv]: {
+    log: (s: string) => T.Effect<T.NoEnv, T.NoErr, void>;
+  };
+}
+
+// live implementation of the console effect
+const consoleLive: Console = {
+  [consoleEnv]: {
+    log: s =>
+      T.sync(() => {
+        console.log(s);
+      })
   }
+};
 
-  const env = pipe(
-      T.noEnv,
-      T.mergeEnv({ [http_symbol]: 10 }),
-      T.mergeEnv(env2),
-      T.mergeEnv(env3)
-  )
+// utility to access the console log through the environment
+function log(s: string): T.Effect<Console, never, void> {
+  return T.accessM(({ [consoleEnv]: { log } }: Console) => log(s));
+}
 
-  assert.deepEqual(
-    await T.runToPromiseExit(
-      pipe(
-        T.access(({ [http_symbol]: n }: HttpEnv) => n),
-        T.provideAll(env)
-      )
-    ),
-    ex.done(10)
-  );
-});
+// log the app name, combine the environment requirements
+const program: T.Effect<Console & AppConfig, never, void> = pipe(
+  appName(),
+  T.chain(log)
+);
 
+// construct the live environment
+const live = pipe(
+  T.noEnv, 
+  T.mergeEnv(appConfigLive), 
+  T.mergeEnv(consoleLive)
+);
+
+T.run(
+  T.provideAll(live)(program), // print: My First App
+  foldExit(() => {
+    // no output
+  })
+);
 ```
 
-You should play with each of the above combinators and try them in the various scenarios that you can think of, in each package you can find the same pattern applied over and over at: [https://github.com/mikearnaldi/matechs-effect/tree/master/packages](https://github.com/mikearnaldi/matechs-effect/tree/master/packages) \(look at test packages first to understand usage\)
+## Notes
+
+Type signatures of chain and all the main combinators have been refined to merge environment requirements so you can keep environment requirements on each function as small as possible as the required environment of a function is the environment you will have to provide for test purposes. 
+
+### Side
+
+When you use environmental effects for everything you easily get to the point of having very long chains of combined environments, it is useful not to restrict the return type of your functions from the beginning and progressively type as you go. Type aliases can significantly reduce this "problem" and make consumer usage more friendly.
+
+An example of the above can be seen in the [express](https://github.com/mikearnaldi/matechs-effect/blob/master/packages/express/src/index.ts#L182) package where environment aliases have been exposed in a combined way for the consumer while internally kept more granular \(granularity can help further with progressive providing of environment see for example the [route](https://github.com/mikearnaldi/matechs-effect/blob/master/packages/express/src/index.ts#L131) combinator in the express package\)
 
