@@ -136,9 +136,7 @@ T.run(
 
 ## Notes
 
-Type signatures of chain and all the main combinators have been refined to merge environment requirements so you can keep environment requirements on each function as small as possible as the required environment of a function is the environment you will have to provide for test purposes. 
-
-### Side
+Type signatures of chain and all the main combinators have been refined to merge environment requirements so you can keep environment requirements on each function as small as possible as the required environment of a function is the environment you will have to provide for test purposes.
 
 When you use environmental effects for everything you easily get to the point of having very long chains of combined environments, it is useful not to restrict the return type of your functions from the beginning and progressively type as you go. Type aliases can significantly reduce this "problem" and make consumer usage more friendly.
 
