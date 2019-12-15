@@ -23,6 +23,7 @@ import { Server } from "http";
 // environment entries
 export const expressAppEnv: unique symbol = Symbol();
 export const expressEnv: unique symbol = Symbol();
+export const requestContextEnv: unique symbol = Symbol();
 
 // environment to hold the app instance
 export interface HasExpress {
@@ -36,10 +37,10 @@ export type Method = "post" | "get" | "put" | "patch" | "delete";
 // effect
 export interface Express {
     withApp<R, E, A>(op: T.Effect<R & HasExpress, E, A>): T.Effect<R, E, A>;
-    route<R, E, RES>(
+    route<R, E, A>(
       method: Method,
       path: string,
-      f: (req: EX.Request) => T.Effect<R, E, RES>
+      f: (req: EX.Request) => T.Effect<R, RouteError<E>, RouteResponse<A>>
     ): T.Effect<R & HasExpress, T.NoErr, void>;
     bind(
       port: number,
@@ -48,16 +49,51 @@ export interface Express {
   };
 }
 
+// describe an errored response
+export interface RouteError<E> {
+  status: number;
+  body: E;
+}
+
+// create error response
+export function routeError<E>(status: number, body: E): RouteError<E> {
+  return {
+    status,
+    body
+  };
+}
+
+// describe successful response
+export interface RouteResponse<A> {
+  status: number;
+  body: A;
+}
+
+// create successful response
+export function routeResponse<A>(status: number, body: A): RouteResponse<A> {
+  return {
+    status,
+    body
+  };
+}
+
 // provides a new app into env of op
 export function withApp<R, E, A>(
   op: T.Effect<R & HasExpress, E, A>
 ): T.Effect<Express & R, E, A>
 
+// describe the environment used to carry current request
+export interface RequestContext {
+  [requestContextEnv]: {
+    request: EX.Request;
+  };
+}
+
 // bind a new route to express
-export function route<R, E, RES>(
+export function route<R, E, A>(
   method: Method,
   path: string,
-  f: (req: EX.Request) => T.Effect<R, E, RES>
+  handler: T.Effect<R & RequestContext, RouteError<E>, RouteResponse<A>>
 ): T.Effect<R & HasExpress & Express, T.NoErr, void> 
 
 // listen on hostname:port
@@ -75,6 +111,16 @@ export function accessAppM<R, E, A>(
 export function accessApp<A>(
   f: (app: EX.Express) => A
 ): T.Effect<HasExpress & Express, T.NoErr, A> 
+
+// access request
+export function accessReqM<R, E, A>(
+  f: (req: EX.Request) => T.Effect<R, E, A>
+): T.Effect<RequestContext & Express & R, E, A>
+
+// access request purely
+export function accessReq<A>(
+  f: (req: EX.Request) => A
+): T.Effect<RequestContext & Express, never, A>
 
 // environment for consumer usage
 export type ExpressEnv = HasExpress & Express;
@@ -96,10 +142,14 @@ const program = EX.withApp(
   Do(T.effect)
     .do(
       // bind GET / to {"message":"OK"}
-      EX.route("get", "/", () =>
-        T.sync(() => ({
-          message: "OK"
-        }))
+      EX.route(
+        "get",
+        "/",
+        T.pure(
+          EX.routeResponse(200, {
+            message: "OK"
+          })
+        )
       )
     )
     .bind("server", EX.bind(8081)) // listen on port 8081

@@ -359,5 +359,5 @@ $ yarn ts-node src/client.ts
 
 You can wire as many modules as you need! Keep in mind both arguments and return types \(error/success\) must be serializable in order for RPC to do its magic.
 
-Full example with complete separation of server/client available at [https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo](https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo).
+Full example with complete separation of server/client and authentication available at [https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo](https://github.com/mikearnaldi/matechs-effect/tree/master/packages/rpc/demo).
 
