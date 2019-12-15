@@ -125,6 +125,9 @@ export function accessReq<A>(
 // environment for consumer usage
 export type ExpressEnv = HasExpress & Express;
 
+// environment for consumer usage in request
+export type ChildEnv = ExpressEnv & RequestContext;
+
 // implementation
 export const express: Express
 ```
