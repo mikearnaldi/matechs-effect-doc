@@ -72,7 +72,7 @@ export function client<M extends Remote<M>, K extends keyof M>(m: M, k: K): Clie
 
 // merge environment requirements for the whole module
 export type Runtime<M> = M extends {
-  [h: string]: (...args: any[]) => T.Effect<infer Q, any, any>;
+  [h: string]: (...args: any[]) => T.Effect<infer Q & E.RequestContext, any, any>;
 }
   ? Q
   : never;
