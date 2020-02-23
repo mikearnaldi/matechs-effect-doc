@@ -23,6 +23,13 @@ $ yarn install fp-ts fp-ts-contrib @matechs/effect
 $ yarn install -D typescript
 ```
 
+## License
+
+The library is released with an MIT license and the codebase is fully open-source at:   
+[https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect)  
+  
+As with any good library there is a commercial project that support the development and maintainance, if you want to know more find us at [https://www.matechs.com/](https://www.matechs.com/) we are a digital accelerator looking for smart founders!
+
 ## Project Config
 
 You will need to scaffold a classic `npm` package with TypeScript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both `tsconfig` & `jest` configs.
