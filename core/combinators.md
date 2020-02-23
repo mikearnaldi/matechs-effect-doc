@@ -492,8 +492,9 @@ const asyncValue = T.async<never, number>(r => {
     r(right(10));
   }, 100);
 
-  return () => {
+  return (cb) => {
     clearTimeout(timer);
+    cb()
   };
 });
 

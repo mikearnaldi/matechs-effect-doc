@@ -79,7 +79,6 @@ const consoleUri: unique symbol = Symbol();
 // create an interface that describe the module
 // you want to put only core implementation functions here
 interface ConsoleEnv {
-  [consoleUri]: {
     log: (s: string) => T.Effect<unknown, never, void>;
   };
 }
@@ -105,7 +104,6 @@ Let's write an implementation:
 
 ```typescript
 const consoleLive: ConsoleEnv = {
-  [consoleUri]: {
     log: (s: string) => T.sync(() => console.log(s))
   }
 };
