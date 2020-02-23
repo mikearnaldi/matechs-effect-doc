@@ -47,9 +47,10 @@ export function trySyncMap<E = unknown>(
 
 // wrap an async callback into an effect, op return Lazy is triggered
 // on cancel
-export function async<E, A>(
-  op: FunctionN<[FunctionN<[Either<E, A>], void>], Lazy<void>>
-): Effect<NoEnv, E, A>
+// type AsyncContFn<E, A> = F.FunctionN<[Ei.Either<E, A>], void>;
+// type AsyncCancelContFn = F.FunctionN<[(error?: Error) => void], void>;
+// type AsyncFn<E, A> = F.FunctionN<[AsyncContFn<E, A>], AsyncCancelContFn>;
+export function async<E, A>(op: AsyncFn<E, A>): Effect<NoEnv, E, A>
 
 // wrap an async callback into an effect that cannot fail
 export function asyncTotal<A>(
