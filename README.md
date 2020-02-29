@@ -14,13 +14,13 @@ The latest development in the core TypeScript language allow us to take environm
 
 ## Installation
 
-So let's get the superpowers, bootstrap a new `npm` project and install basic dependencies:
+So let's get the superpowers, bootstrap a new `yarn` project and install basic dependencies:
 
 ```text
 $ mkdir my-project
 $ yarn init -y
-$ yarn install fp-ts fp-ts-contrib @matechs/effect
-$ yarn install -D typescript
+$ yarn add fp-ts fp-ts-contrib @matechs/effect
+$ yarn add -D typescript
 ```
 
 ## License
