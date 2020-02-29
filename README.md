@@ -19,7 +19,7 @@ So let's get the superpowers, bootstrap a new `yarn` project and install basic d
 ```text
 $ mkdir my-project
 $ yarn init -y
-$ yarn add fp-ts fp-ts-contrib @matechs/effect
+$ yarn add fp-ts fp-ts-contrib retry-ts @matechs/effect
 $ yarn add -D typescript
 ```
 
