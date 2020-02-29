@@ -19,8 +19,8 @@ So let's get the superpowers, bootstrap a new `npm` project and install basic de
 ```text
 $ mkdir my-project
 $ yarn init -y
-$ yarn install fp-ts fp-ts-contrib @matechs/effect
-$ yarn install -D typescript
+$ yarn add fp-ts fp-ts-contrib @matechs/effect
+$ yarn add -D typescript
 ```
 
 ## License
