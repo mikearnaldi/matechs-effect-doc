@@ -657,3 +657,27 @@ Note that errors are final if not handled in place, if you want a non final impl
 
 An implementation of `StreamEither` will be provided in work in progress and will be added to the core. 
 
+### takeWhile
+
+```ts
+import { log, provideConsole } from "@matechs/console";
+
+const sleep = (ms: number) => pipe(T.delay(log("I woke up!"), ms));
+
+pipe(
+  S.periodically(1000),
+  takeUntil(sleep(5000)),
+  S.chain((n) => S.encaseEffect(log(n))),
+  S.drain,
+  provideConsole,
+  T.run
+);
+
+// prints
+// 0
+// 1
+// 2
+// 3
+// I woke up!
+```
+
