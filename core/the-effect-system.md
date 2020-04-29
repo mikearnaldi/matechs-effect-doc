@@ -193,30 +193,91 @@ This is the first time we see a very important principle in statically typed fun
 
 ## Environmental Effect
 
-We can create a module that wraps the console interaction and use the module from environment like:
+We can create a module that wraps the add / mul operations in the environment as follows:
 
 ```typescript
-// create a unique symbol to identify the module in the environment
-// you can use either a unique symbol or a string, 
-const consoleUri: unique symbol = Symbol();
+import { T, pipe, Ex } from "@matechs/aio";
+import * as assert from "assert";
 
-// create an interface that describe the module
-// you want to put only core implementation functions here
-interface ConsoleEnv {
-  [consoleUri]: {
-    log: (s: string) => T.Effect<unknown, never, void>;
+// define a unique resource identifier
+const CalculatorURI = "@matechs/examples/CalculatorURI";
+
+// define the module description as an interface
+interface Calculator {
+  // scope it using the previously defined URI
+  [CalculatorURI]: {
+    add(x: number, y: number): T.Sync<number>;
+    mul(x: number, y: number): T.Sync<number>;
   };
 }
 
-// create utility functions that access the environment
-// and use the effect
-// you want to create a DSL using those functions
-function log(s: string) {
-  return T.accessM((env: ConsoleEnv) => env[consoleUri].log(s));
-}
-```
+// access the module from environment and expose the add function
+const add = (x: number, y: number): T.SyncR<Calculator, number> =>
+  T.accessM(({ [CalculatorURI]: { add } }: Calculator) => add(x, y));
 
-Let's use our newly created `log` function:
+// access the module from environment and expose the mul function
+const mul = (x: number, y: number): T.SyncR<Calculator, number> =>
+  T.accessM(({ [CalculatorURI]: { mul } }: Calculator) => mul(x, y));
+
+// our program is now independent from a concrete implementation
+const addAndMul: T.SyncR<Calculator, number> = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2))
+);
+
+// define a provider for the specific Calculator module
+const provideCalculator = T.provide<Calculator>({
+  [CalculatorURI]: {
+    add: (x, y) => T.sync(() => x + y),
+    mul: (x, y) => T.sync(() => x * y)
+  }
+});
+
+// run the program providing the concrete implementation
+const result: Ex.Exit<never, number> = pipe(
+  addAndMul,
+  provideCalculator,
+  T.runSync
+);
+
+assert.deepStrictEqual(result, Ex.done(6));
+
+// define a second provider for the specific Calculator module
+const provideCalculatorWithLog = (messages: Array<string>) =>
+  T.provide<Calculator>({
+    [CalculatorURI]: {
+      add: (x, y) =>
+        T.applySecond(
+          T.sync(() => {
+            messages.push(`called add with ${x}, ${y}`);
+          }),
+          T.sync(() => x + y)
+        ),
+      mul: (x, y) =>
+        T.applySecond(
+          T.sync(() => {
+            messages.push(`called mul with ${x}, ${y}`);
+          }),
+          T.sync(() => x * y)
+        )
+    }
+  });
+
+// run the program providing the concrete implementation
+const messages: Array<string> = [];
+const resultWithLog: Ex.Exit<never, number> = pipe(
+  addAndMul,
+  provideCalculatorWithLog(messages),
+  T.runSync
+);
+
+assert.deepStrictEqual(resultWithLog, Ex.done(6));
+assert.deepStrictEqual(messages, [
+  "called add with 1, 2",
+  "called mul with 3, 2"
+]);
+
+```
 
 ```typescript
 // as you can see we are now requiring a ConsoleEnv to run our effect
