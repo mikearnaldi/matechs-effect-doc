@@ -276,65 +276,154 @@ assert.deepStrictEqual(messages, [
   "called add with 1, 2",
   "called mul with 3, 2"
 ]);
-
 ```
 
+## Multiple Environments
+
+We can arbitrarily compose computations that require different environments as follows:
+
 ```typescript
-// as you can see we are now requiring a ConsoleEnv to run our effect
-const helloWorld: T.Effect<ConsoleEnv, never, void> = log(
-  "hello world"
+import { T, pipe, Ex } from "@matechs/aio";
+import * as assert from "assert";
+
+// define a unique resource identifier
+const AddURI = "@matechs/examples/AddURI";
+
+// define the module description as an interface
+interface Add {
+  // scope it using the previously defined URI
+  [AddURI]: {
+    add(x: number, y: number): T.Sync<number>;
+  };
+}
+
+// define a unique resource identifier
+const MulURI = "@matechs/examples/MulURI";
+
+// define the module description as an interface
+interface Mul {
+  // scope it using the previously defined URI
+  [MulURI]: {
+    mul(x: number, y: number): T.Sync<number>;
+  };
+}
+
+// access the module from environment and expose the add function
+const add = (x: number, y: number): T.SyncR<Add, number> =>
+  T.accessM(({ [AddURI]: { add } }: Add) => add(x, y));
+
+// access the module from environment and expose the mul function
+const mul = (x: number, y: number): T.SyncR<Mul, number> =>
+  T.accessM(({ [MulURI]: { mul } }: Mul) => mul(x, y));
+
+// our program is now independent from a concrete implementation
+const addAndMul = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2))
+);
+
+// define a provider for the specific Add module
+const provideAdd = T.provide<Add>({
+  [AddURI]: {
+    add: (x, y) => T.sync(() => x + y)
+  }
+});
+
+// define a provider for the specific Mul module
+const provideMul = T.provide<Mul>({
+  [MulURI]: {
+    mul: (x, y) => T.sync(() => x * y)
+  }
+});
+
+// run the program providing the concrete implementation
+const result: Ex.Exit<never, number> = pipe(
+  addAndMul, // T.SyncR<Mul & Add, number>
+  provideAdd, // T.SyncR<Mul, number>
+  provideMul, // T.Sync<number>
+  T.runSync
+);
+
+assert.deepStrictEqual(result, Ex.done(6));
+```
+
+Note how we purposly omitted the type of addAndMul to show that all requirements are correctly inferred from usage, in fact if we forget to provide one dependency we will get a compilation error indicating that the dependency is missing as follows
+
+```typescript
+// run the program providing the concrete implementation
+const result: Ex.Exit<never, number> = pipe(
+  addAndMul,
+  provideAdd,
+  T.runSync // '[MulURI]' is missing in type '{}' but required in type 'Mul'
 );
 ```
 
-Let's write an implementation:
+## Combining Providers
+
+We can combine arbitrary providers as follows:
 
 ```typescript
-const consoleLive: ConsoleEnv = {
-  [consoleUri]: {
-    log: (s: string) => T.sync(() => console.log(s))
-  }
-};
-```
+import { T, pipe, Ex, combineProviders } from "@matechs/aio";
+import * as assert from "assert";
 
-## Running Live
+// define a unique resource identifier
+const AddURI = "@matechs/examples/AddURI";
 
-In order to run the program you will need to provide the module before passing it into the `run`/`runToPromise`/`runToPromiseExit`:
-
-```typescript
-T.run(T.provideAll(consoleLive)(helloWorld))
-```
-
-The `provideAll` function takes a complete environment and provides it to the program, when called this will print:
-
-```typescript
-$ yarn ts-node src/hello.ts
-hello world!
-```
-
-## Running Test
-
-What if we want to test now?
-
-```typescript
-// in your preferred test framework  
-async function helloWorldTest() {
-  // hold messages
-  const messages: string[] = [];
-
-  const consoleTest: ConsoleEnv = {
-    [consoleUri]: {
-      log: (s: string) =>
-        T.sync(() => {
-          messages.push(s);
-        })
-    }
+// define the module description as an interface
+interface Add {
+  // scope it using the previously defined URI
+  [AddURI]: {
+    add(x: number, y: number): T.Sync<number>;
   };
-
-  // the real "log" & "helloWorld" will be called, console will be
-  // using test environment
-  await T.runToPromiseExit(T.provideAll(consoleTest)(helloWorld));
-
-  assert.deepEqual(messages, ["hello world"])
 }
+
+// define a unique resource identifier
+const MulURI = "@matechs/examples/MulURI";
+
+// define the module description as an interface
+interface Mul {
+  // scope it using the previously defined URI
+  [MulURI]: {
+    mul(x: number, y: number): T.Sync<number>;
+  };
+}
+
+// access the module from environment and expose the add function
+const add = (x: number, y: number): T.SyncR<Add, number> =>
+  T.accessM(({ [AddURI]: { add } }: Add) => add(x, y));
+
+// access the module from environment and expose the mul function
+const mul = (x: number, y: number): T.SyncR<Mul, number> =>
+  T.accessM(({ [MulURI]: { mul } }: Mul) => mul(x, y));
+
+// our program is now independent from a concrete implementation
+const addAndMul = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2))
+);
+
+// define a provider for the specific Add module
+const provideAdd = T.provide<Add>({
+  [AddURI]: {
+    add: (x, y) => T.sync(() => x + y)
+  }
+});
+
+// define a provider for the specific Mul module
+const provideMul = T.provide<Mul>({
+  [MulURI]: {
+    mul: (x, y) => T.sync(() => x * y)
+  }
+});
+
+// combine the 2 providers in 1
+// inferred as T.Provider<unknown, Add & Mul, never, never>
+const provideLive = combineProviders().with(provideAdd).with(provideMul).done();
+
+// run the program providing the concrete implementation
+const result: Ex.Exit<never, number> = pipe(addAndMul, provideLive, T.runSync);
+
+assert.deepStrictEqual(result, Ex.done(6));
+
 ```
 
