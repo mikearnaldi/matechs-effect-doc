@@ -35,6 +35,8 @@ a success reponse of type A
 
 ## Package Exports
 
+Below the lost of exported modules included in @matechs/aio
+
 ```typescript
 import * as I from "io-ts";
 import * as IT from "io-ts-types";
