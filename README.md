@@ -19,16 +19,18 @@ So let's get the superpowers, bootstrap a new `yarn` project and install basic d
 ```text
 $ mkdir my-project
 $ yarn init -y
-$ yarn add fp-ts fp-ts-contrib retry-ts @matechs/effect
+$ yarn add @matechs/aio
 $ yarn add -D typescript
 ```
 
+Note that @matechs/aio \(all-in-one\) includes all the required dependencies plus a rich set of optional libraries like io-ts, morphic-ts, newtype-ts, monocle-ts that makes development in typescript extremely productive
+
 ## License
 
-The library is released with an MIT license and the codebase is fully open-source at:   
-[https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect)  
-  
-As with any good library there is a commercial project that support the development and maintainance, if you want to know more find us at [https://www.matechs.com/](https://www.matechs.com/) we are a digital accelerator looking for smart founders!
+The library is released with under MIT license and the codebase is fully open-source at:  
+[https://github.com/Matechs-Garage/matechs-effect](https://github.com/Matechs-Garage/matechs-effect)
+
+As with any good library there is a commercial project that support the development and maintainance, if you want to know more find us at [https://www.matechs.com/](https://www.matechs.com/) we are a digital accelerator looking for smart founders & projects to build!
 
 ## Notes
 
@@ -36,5 +38,5 @@ Docs are meant to be only for introduction to the architecture but are still out
 
 ## Project Config
 
-You will need to scaffold a classic `npm` package with TypeScript configured strictly, additionally we advice configuration of jest or another testing framework of your choice: you can find examples at [https://github.com/mikearnaldi/matechs-effect](https://github.com/mikearnaldi/matechs-effect) where you can "copy" both `tsconfig` & `jest` configs.
+You will need to bootstrap a classic `npm` package with TypeScript configured in "strict" mode.
 
