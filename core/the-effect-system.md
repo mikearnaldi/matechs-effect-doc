@@ -4,6 +4,8 @@ description: Description of the core component of the system
 
 # The Effect System
 
+## Effect Type & Aliases
+
 The main type you will be working with is:
 
 ```typescript
