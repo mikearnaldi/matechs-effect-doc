@@ -7,65 +7,189 @@ description: Description of the core component of the system
 The main type you will be working with is:
 
 ```typescript
-type Effect<R, E, A>
+type Effect<S, R, E, A>
+
+type Async<A> = Effect<unknown, unknown, never, A>;
+type AsyncE<E, A> = Effect<unknown, unknown, E, A>;
+type AsyncR<R, A> = Effect<unknown, R, never, A>;
+type AsyncRE<R, E, A> = Effect<unknown, R, E, A>;
+
+type Sync<A> = Effect<never, unknown, never, A>;
+type SyncE<E, A> = Effect<never, unknown, E, A>;
+type SyncR<R, A> = Effect<never, R, never, A>;
+type SyncRE<R, E, A> = Effect<never, R, E, A>;
 ```
 
-Mentally you can think of this in simplified terms as:
+The Effect signature reads as follows:
+
+```text
+Effect<S, R, E, A> is an effectful computation that 
+
+can be Syncronious or Asyncronious (S) and
+requires an environment of type R to run and
+can produce either an error of type E or
+a success reponse of type A
+```
+
+## Package Exports
 
 ```typescript
-type Effect<R, E, A> = (environment: R) => Async<E, A>
-```
+import * as I from "io-ts";
+import * as IT from "io-ts-types";
+import * as NT from "newtype-ts";
+import * as MN from "monocle-ts";
+import * as MO from "./morphic";
 
-Where `R` represents an environment needed for the computation `Async<E, A>` to run and when started the computation may succeed with a result `A` or fail with an error `E`.
+export {
+  I, // io-ts
+  IT, // io-ts-types
+  NT, // newtype-ts
+  MN, // monocle-ts
+  MO // morphic-ts
+};
+
+export {
+  A, // fp-ts Array
+  CRef, // Concurrent Reference
+  E, // fp-ts augumented Either
+  Ex, // Exit
+  F, // fp-ts Function
+  M, // Managed
+  NEA, // fp-ts NonEmptyArray
+  O, // fp-ts augumented Option
+  Q, // Queue
+  RT, // Retry
+  Rec, // Recursion Schemes
+  Ref, // Reference
+  S, // Stream
+  SE, // StreamEither
+  Sem, // Semaphore
+  Service, // FreeEnv Service Definition & Derivation
+  T, // Effect
+  U, // Type Utils
+  combineProviders, // Combine Providers
+  eq, // fp-ts Eq
+  flow, // fp-ts flow
+  flowF, // fluent flow - not limited to 10
+  magma, // fp-ts Magma
+  map, // fp-ts Map
+  monoid, // fp-ts Monoid
+  pipe, // fp-ts pipe
+  pipeF, // fluent pipe - not limited to 10
+  record, // fp-ts Record
+  semigroup, // fp-ts Semigroup
+  set, // fp-ts Set
+  show, // fp-ts Show
+  tree // fp-ts Tree
+} from "@matechs/prelude";
+
+```
 
 ## Simple Effect
 
-Let's start with a simple hello world:
+Let's start with a simple syncronious computation:
 
 ```typescript
-import { effect as T } from "@matechs/effect"
+import { T, pipe, Ex } from "@matechs/aio";
+import * as assert from "assert";
 
-const helloWorld = T.sync(() => {
-    console.log("hello world!")
+const add = (x: number, y: number): T.Sync<number> => T.sync(() => x + y);
+const mul = (x: number, y: number): T.Sync<number> => T.sync(() => x * y);
+
+const addAndMul = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2))
+);
+
+const result: Ex.Exit<never, number> = T.runSync(addAndMul);
+
+assert.deepStrictEqual(result, Ex.done(6));
+```
+
+The same computation can run in different ways:
+
+```typescript
+import { T, pipe, Ex, F } from "@matechs/aio";
+import * as assert from "assert";
+
+const add = (x: number, y: number): T.Sync<number> => T.sync(() => x + y);
+const mul = (x: number, y: number): T.Sync<number> => T.sync(() => x * y);
+
+const addAndMul = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2))
+);
+
+// run as non failable promise returning Exit
+T.runToPromiseExit(addAndMul).then((result) => {
+  assert.deepStrictEqual(result, Ex.done(6));
+});
+
+// run as failable promise returning result
+T.runToPromise(addAndMul)
+  .then((result) => {
+    assert.deepStrictEqual(result, 6);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+// invoking canceller cancel the computation (not in this case because all sync)
+const canceller: F.Lazy<void> = T.run(addAndMul, (result) => {
+    assert.deepStrictEqual(result, Ex.done(6));
+})
+
+// run as throwable
+const result_n: number = T.runUnsafeSync(addAndMul)
+
+assert.deepStrictEqual(result_n, 6);
+```
+
+Let's add some asynchronousity to the computation by adding a simple delay via liftDelay:
+
+```typescript
+import { T, pipe, Ex, F } from "@matechs/aio";
+import * as assert from "assert";
+
+const add = (x: number, y: number): T.Sync<number> => T.sync(() => x + y);
+const mul = (x: number, y: number): T.Sync<number> => T.sync(() => x * y);
+
+const addAndMul = pipe(
+  add(1, 2),
+  T.chain((n) => mul(n, 2)),
+  T.liftDelay(100) // delay execution for 100ms
+);
+
+// run as non failable promise returning Exit
+T.runToPromiseExit(addAndMul).then((result) => {
+  assert.deepStrictEqual(result, Ex.done(6));
+});
+
+// run as failable promise returning result
+T.runToPromise(addAndMul)
+  .then((result) => {
+    assert.deepStrictEqual(result, 6);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
+// invoking canceller cancel the computation (not in this case because all sync)
+const canceller: F.Lazy<void> = T.run(addAndMul, (result) => {
+    assert.deepStrictEqual(result, Ex.done(6));
 })
 ```
 
-We can already highlight the type of `helloWorld` and discover that:
+If we now try to use runSync we will get a compile error:
 
 ```typescript
-import { effect as T } from "@matechs/effect"
-
-const helloWorld: T.Effect<unknown, never, void> = T.sync(() => {
-    console.log("hello world!")
-})
+T.runSync(addAndMul) 
+// Argument of type 'AsyncRE<unknown, never, number>' is not assignable
+// to parameter of type 'SyncRE<{}, never, number>'. 
+// Type 'unknown' is not assignable to type 'never'
 ```
 
-So we can say that `helloWorld` is an effect that requires no environment, can never fail and upon completion returns `void`.
-
-## Running
-
-We can run the effect in multiple ways:
-
-```typescript
-// failable promise
-const asPromise: Promise<void> = T.runToPromise(helloWorld)
-
-// non failable promise, Exit will be disected later but encapsulate all exit
-// scenarios (success, raised, aborted, interrupted)
-const asPromiseExit: Promise<Exit<never, void>> = T.runToPromiseExit(helloWorld)
-
-// the best way to run the effect is not to use a promise, 
-// both for performance reasons and because promise is not easily
-// cancellable. 
-const cancelFunction: Lazy<void> = T.run(helloWorld, (ex: Exit<never, void>) => {
-    // executed
-})
-
-// cancel the running computation
-cancelFunction();
-```
-
-What's wrong with this? Nothing in principle, but from `helloWorld` we are directly calling `console.log`. What if we want to test this?
+This is the first time we see a very important principle in statically typed functional programming, encoding logic at the type level to make errors impossible. 
 
 ## Environmental Effect
 
