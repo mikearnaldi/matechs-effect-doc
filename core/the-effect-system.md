@@ -27,7 +27,7 @@ The Effect signature reads as follows:
 ```text
 Effect<S, R, E, A> is an effectful computation that 
 
-can be Syncronious or Asyncronious (S) and
+can be Synchronous or Asynchronous (S) and
 requires an environment of type R to run and
 can produce either an error of type E or
 a success reponse of type A
@@ -91,7 +91,7 @@ export {
 
 ## Simple Effect
 
-Let's start with a simple syncronious computation:
+Let's start with a simple synchronous computation:
 
 ```typescript
 import { T, pipe, Ex } from "@matechs/aio";
