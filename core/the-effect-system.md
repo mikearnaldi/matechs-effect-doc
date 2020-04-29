@@ -1,5 +1,5 @@
 ---
-description: Description of the core component of the system
+description: Description of the core effect system
 ---
 
 # The Effect System
